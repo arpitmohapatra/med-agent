@@ -55,12 +55,18 @@ const SourceCard: React.FC<SourceCardProps> = ({ source, index }) => {
       {/* Medicine Information */}
       {medicineInfo.name && medicineInfo.name !== 'Unknown Medicine' && (
         <div className="mb-3 space-y-2">
-          {medicineInfo.composition && (
+          {/* Chemical/Therapeutic Class */}
+          {(medicineInfo.chemicalClass || medicineInfo.therapeuticClass) && (
             <div className="flex items-start space-x-2">
               <DocumentTextIcon className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
               <div>
-                <span className="text-xs font-medium text-gray-600">Composition:</span>
-                <p className="text-sm text-gray-700">{truncateText(medicineInfo.composition, 100)}</p>
+                <span className="text-xs font-medium text-gray-600">Class:</span>
+                <p className="text-sm text-gray-700">
+                  {[medicineInfo.chemicalClass, medicineInfo.therapeuticClass]
+                    .filter(c => c && c !== 'NA')
+                    .join(' • ')
+                  }
+                </p>
               </div>
             </div>
           )}
@@ -70,7 +76,7 @@ const SourceCard: React.FC<SourceCardProps> = ({ source, index }) => {
               <InformationCircleIcon className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
               <div>
                 <span className="text-xs font-medium text-gray-600">Uses:</span>
-                <p className="text-sm text-gray-700">{truncateText(medicineInfo.uses, 100)}</p>
+                <p className="text-sm text-gray-700">{truncateText(medicineInfo.uses, 120)}</p>
               </div>
             </div>
           )}
@@ -80,7 +86,7 @@ const SourceCard: React.FC<SourceCardProps> = ({ source, index }) => {
               <ExclamationTriangleIcon className="w-4 h-4 text-yellow-400 mt-0.5 flex-shrink-0" />
               <div>
                 <span className="text-xs font-medium text-gray-600">Side Effects:</span>
-                <p className="text-sm text-gray-700">{truncateText(medicineInfo.sideEffects, 100)}</p>
+                <p className="text-sm text-gray-700">{truncateText(medicineInfo.sideEffects, 120)}</p>
               </div>
             </div>
           )}
@@ -90,7 +96,18 @@ const SourceCard: React.FC<SourceCardProps> = ({ source, index }) => {
               <ArrowsRightLeftIcon className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
               <div>
                 <span className="text-xs font-medium text-gray-600">Substitutes:</span>
-                <p className="text-sm text-gray-700">{truncateText(medicineInfo.substitutes, 100)}</p>
+                <p className="text-sm text-gray-700">{truncateText(medicineInfo.substitutes, 120)}</p>
+              </div>
+            </div>
+          )}
+          
+          {/* Habit Forming Warning */}
+          {medicineInfo.habitForming && medicineInfo.habitForming !== 'No' && medicineInfo.habitForming !== 'NA' && (
+            <div className="flex items-start space-x-2">
+              <ExclamationTriangleIcon className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" />
+              <div>
+                <span className="text-xs font-medium text-red-600">Habit Forming:</span>
+                <p className="text-sm text-red-700">{medicineInfo.habitForming}</p>
               </div>
             </div>
           )}
@@ -107,8 +124,11 @@ const SourceCard: React.FC<SourceCardProps> = ({ source, index }) => {
       {/* Footer */}
       <div className="flex items-center justify-between text-xs text-gray-500">
         <div className="flex items-center space-x-3">
-          {medicineInfo.manufacturer && (
-            <span>by {medicineInfo.manufacturer}</span>
+          {medicineInfo.actionClass && medicineInfo.actionClass !== 'NA' && (
+            <span>{medicineInfo.actionClass}</span>
+          )}
+          {medicineInfo.medicineId && (
+            <span>ID: {medicineInfo.medicineId}</span>
           )}
           {source.metadata.type && (
             <span className="capitalize">{source.metadata.type}</span>

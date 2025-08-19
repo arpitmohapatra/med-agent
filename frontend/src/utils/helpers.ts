@@ -39,6 +39,15 @@ export const extractMedicineInfo = (metadata: Record<string, any>) => {
     manufacturer: metadata.manufacturer || '',
     dosage: metadata.dosage || '',
     price: metadata.price || '',
+    // Additional fields from the new dataset
+    chemicalClass: metadata.chemical_class || '',
+    therapeuticClass: metadata.therapeutic_class || '',
+    actionClass: metadata.action_class || '',
+    habitForming: metadata.habit_forming || '',
+    medicineId: metadata.medicine_id || '',
+    usesList: metadata.uses_list || [],
+    sideEffectsList: metadata.side_effects_list || [],
+    substitutesList: metadata.substitutes_list || [],
   };
 };
 

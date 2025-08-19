@@ -14,19 +14,21 @@ class LLMService:
         # Configure OpenAI client based on provider
         if settings.azure_openai_endpoint and settings.azure_openai_api_key:
             # Azure OpenAI configuration
-            openai.api_type = "azure"
-            openai.api_base = settings.azure_openai_endpoint
-            openai.api_key = settings.azure_openai_api_key
-            openai.api_version = settings.azure_openai_api_version
-            self.client = openai
+            from openai import AzureOpenAI
+            self.client = AzureOpenAI(
+                api_key=settings.azure_openai_api_key,
+                api_version=settings.azure_openai_api_version,
+                azure_endpoint=settings.azure_openai_endpoint
+            )
             self.deployment_name = settings.azure_openai_deployment_name
             self.provider = "azure"
         else:
             # OpenAI configuration
-            openai.api_key = settings.openai_api_key
-            if settings.openai_organization:
-                openai.organization = settings.openai_organization
-            self.client = openai
+            from openai import OpenAI
+            self.client = OpenAI(
+                api_key=settings.openai_api_key,
+                organization=settings.openai_organization
+            )
             self.deployment_name = "gpt-4"
             self.provider = "openai"
 
@@ -100,15 +102,15 @@ Explain your reasoning and the steps you're taking.{base_disclaimer}"""
             # Generate response
             if stream:
                 if self.provider == "azure":
-                    response = await self.client.ChatCompletion.acreate(
-                        engine=model,
+                    response = self.client.chat.completions.create(
+                        model=model,
                         messages=api_messages,
                         temperature=settings.temperature,
                         max_tokens=settings.max_tokens,
                         stream=True
                     )
                 else:
-                    response = await self.client.ChatCompletion.acreate(
+                    response = self.client.chat.completions.create(
                         model=model,
                         messages=api_messages,
                         temperature=settings.temperature,
@@ -117,28 +119,28 @@ Explain your reasoning and the steps you're taking.{base_disclaimer}"""
                     )
                 
                 # Stream response
-                async for chunk in response:
-                    if chunk.choices and chunk.choices[0].delta.get("content"):
-                        yield chunk.choices[0].delta["content"]
+                for chunk in response:
+                    if chunk.choices and chunk.choices[0].delta.content:
+                        yield chunk.choices[0].delta.content
             
             else:
                 # Non-streaming response
                 if self.provider == "azure":
-                    response = await self.client.ChatCompletion.acreate(
-                        engine=model,
+                    response = self.client.chat.completions.create(
+                        model=model,
                         messages=api_messages,
                         temperature=settings.temperature,
                         max_tokens=settings.max_tokens
                     )
                 else:
-                    response = await self.client.ChatCompletion.acreate(
+                    response = self.client.chat.completions.create(
                         model=model,
                         messages=api_messages,
                         temperature=settings.temperature,
                         max_tokens=settings.max_tokens
                     )
                 
-                yield response.choices[0].message["content"]
+                yield response.choices[0].message.content
                 
         except Exception as e:
             logger.error(f"Error generating LLM response: {e}")

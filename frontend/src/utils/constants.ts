@@ -41,10 +41,12 @@ export const SAMPLE_QUERIES = {
     "How does the immune system work?",
   ],
   [CHAT_MODES.RAG]: [
-    "What are the side effects of Paracetamol?",
-    "What is Amoxicillin used for?",
-    "What are substitutes for Metformin?",
-    "How should I take Omeprazole?",
+    "What are the side effects of Augmentin 625?",
+    "What is Azithral 500 tablet used for?",
+    "What are substitutes for Allegra 120mg?",
+    "Is Atarax 25mg habit forming?",
+    "What class of drug is Ascoril LS syrup?",
+    "Side effects of Azee 500 tablet",
   ],
   [CHAT_MODES.AGENT]: [
     "Search PubMed for recent studies on diabetes treatment",

@@ -69,76 +69,74 @@ class MedicineDataIngester:
             return pd.DataFrame()
 
     def process_medicine_record(self, record: dict) -> dict:
-        """Process a single medicine record."""
-        # Map common column names (adjust based on actual CSV structure)
-        column_mappings = {
-            'Medicine': 'name',
-            'medicine_name': 'name',
-            'name': 'name',
-            'Composition': 'composition',
-            'composition': 'composition',
-            'Uses': 'uses',
-            'uses': 'uses',
-            'Side_effects': 'side_effects',
-            'side_effects': 'side_effects',
-            'Substitutes': 'substitutes',
-            'substitutes': 'substitutes',
-            'Manufacturer': 'manufacturer',
-            'manufacturer': 'manufacturer',
-            'Dosage': 'dosage',
-            'dosage': 'dosage',
-            'Price': 'price',
-            'price': 'price'
-        }
+        """Process a single medicine record from the medicine dataset."""
+        # Extract basic info
+        med_id = str(record.get('id', ''))
+        name = str(record.get('name', 'Unknown Medicine')).strip()
+        chemical_class = str(record.get('Chemical Class', '')).strip()
+        habit_forming = str(record.get('Habit Forming', '')).strip()
+        therapeutic_class = str(record.get('Therapeutic Class', '')).strip()
+        action_class = str(record.get('Action Class', '')).strip()
         
-        # Extract and normalize fields
-        processed = {}
-        for original_key, standard_key in column_mappings.items():
-            if original_key in record:
-                processed[standard_key] = str(record[original_key]) if pd.notna(record[original_key]) else ""
+        # Extract substitutes (substitute0 to substitute4)
+        substitutes = []
+        for i in range(5):
+            sub = str(record.get(f'substitute{i}', '')).strip()
+            if sub and sub != 'nan' and sub != '':
+                substitutes.append(sub)
+        substitutes_text = ', '.join(substitutes) if substitutes else ''
         
-        # Create title and content
-        name = processed.get('name', 'Unknown Medicine')
-        composition = processed.get('composition', '')
-        uses = processed.get('uses', '')
-        side_effects = processed.get('side_effects', '')
-        substitutes = processed.get('substitutes', '')
-        manufacturer = processed.get('manufacturer', '')
-        dosage = processed.get('dosage', '')
+        # Extract side effects (sideEffect0 to sideEffect41)
+        side_effects = []
+        for i in range(42):
+            effect = str(record.get(f'sideEffect{i}', '')).strip()
+            if effect and effect != 'nan' and effect != '':
+                side_effects.append(effect)
+        side_effects_text = ', '.join(side_effects) if side_effects else ''
+        
+        # Extract uses (use0 to use4)
+        uses = []
+        for i in range(5):
+            use = str(record.get(f'use{i}', '')).strip()
+            if use and use != 'nan' and use != '':
+                uses.append(use)
+        uses_text = ', '.join(uses) if uses else ''
         
         # Construct title
-        title = f"{name}"
-        if composition:
-            title += f" ({composition})"
+        title = name
+        if chemical_class and chemical_class != 'NA':
+            title += f" ({chemical_class})"
         
-        # Construct comprehensive content
+        # Construct comprehensive content for embedding
         content_parts = []
         
-        if name:
-            content_parts.append(f"Medicine: {name}")
+        content_parts.append(f"Medicine: {name}")
         
-        if composition:
-            content_parts.append(f"Composition: {composition}")
+        if chemical_class and chemical_class != 'NA':
+            content_parts.append(f"Chemical Class: {chemical_class}")
         
-        if uses:
-            content_parts.append(f"Uses: {uses}")
+        if therapeutic_class and therapeutic_class != 'NA':
+            content_parts.append(f"Therapeutic Class: {therapeutic_class}")
         
-        if side_effects:
-            content_parts.append(f"Side Effects: {side_effects}")
+        if action_class and action_class != 'NA':
+            content_parts.append(f"Action Class: {action_class}")
         
-        if substitutes:
-            content_parts.append(f"Substitutes: {substitutes}")
+        if uses_text:
+            content_parts.append(f"Uses: {uses_text}")
         
-        if manufacturer:
-            content_parts.append(f"Manufacturer: {manufacturer}")
+        if side_effects_text:
+            content_parts.append(f"Side Effects: {side_effects_text}")
         
-        if dosage:
-            content_parts.append(f"Dosage: {dosage}")
+        if substitutes_text:
+            content_parts.append(f"Substitutes: {substitutes_text}")
+        
+        if habit_forming and habit_forming != 'NA':
+            content_parts.append(f"Habit Forming: {habit_forming}")
         
         content = "\n\n".join(content_parts)
         
         # Generate document ID
-        doc_id = f"med_{hash(name + composition)}"
+        doc_id = f"med_{med_id}_{hash(name)}"
         
         return {
             "id": doc_id,
@@ -146,16 +144,20 @@ class MedicineDataIngester:
             "content": content,
             "url": f"https://medquery.app/medicine/{doc_id}",
             "metadata": {
+                "medicine_id": med_id,
                 "name": name,
-                "composition": composition,
-                "uses": uses,
-                "side_effects": side_effects,
-                "substitutes": substitutes,
-                "manufacturer": manufacturer,
-                "dosage": dosage,
-                "price": processed.get('price', ''),
+                "chemical_class": chemical_class,
+                "therapeutic_class": therapeutic_class,
+                "action_class": action_class,
+                "habit_forming": habit_forming,
+                "uses": uses_text,
+                "side_effects": side_effects_text,
+                "substitutes": substitutes_text,
+                "uses_list": uses,
+                "side_effects_list": side_effects,
+                "substitutes_list": substitutes,
                 "type": "medicine",
-                "source": "kaggle_medicine_dataset"
+                "source": "medicine_dataset_csv"
             },
             "created_at": datetime.utcnow().isoformat()
         }
@@ -240,25 +242,41 @@ class MedicineDataIngester:
                     doc = self.process_medicine_record(row.to_dict())
                     documents.append(doc)
             else:
-                # Try to download from Kaggle
-                logger.info("Attempting to download Kaggle dataset...")
-                data_dir = await self.download_kaggle_dataset()
-                if data_dir:
-                    # Look for CSV files in the downloaded data
-                    csv_files = list(data_dir.glob("*.csv"))
-                    if csv_files:
-                        csv_path = csv_files[0]
-                        df = await self.load_csv_data(str(csv_path))
+                # Check for existing medicine dataset in current directory
+                current_dir = Path(__file__).parent.parent
+                dataset_path = current_dir / "medicine_dataset.csv"
+                
+                if dataset_path.exists():
+                    logger.info(f"Found medicine dataset at {dataset_path}")
+                    df = await self.load_csv_data(str(dataset_path))
+                    if not df.empty:
+                        logger.info(f"Loading {len(df)} records from medicine dataset...")
                         documents = []
                         for _, row in df.iterrows():
                             doc = self.process_medicine_record(row.to_dict())
                             documents.append(doc)
                     else:
-                        logger.warning("No CSV files found, using sample data")
-                        documents = await self.create_sample_data()
+                        raise ValueError("Medicine dataset is empty")
                 else:
-                    logger.warning("Could not download dataset, using sample data")
-                    documents = await self.create_sample_data()
+                    # Try to download from Kaggle as fallback
+                    logger.info("Medicine dataset not found, attempting to download Kaggle dataset...")
+                    data_dir = await self.download_kaggle_dataset()
+                    if data_dir:
+                        # Look for CSV files in the downloaded data
+                        csv_files = list(data_dir.glob("*.csv"))
+                        if csv_files:
+                            csv_path = csv_files[0]
+                            df = await self.load_csv_data(str(csv_path))
+                            documents = []
+                            for _, row in df.iterrows():
+                                doc = self.process_medicine_record(row.to_dict())
+                                documents.append(doc)
+                        else:
+                            logger.warning("No CSV files found, using sample data")
+                            documents = await self.create_sample_data()
+                    else:
+                        logger.warning("Could not download dataset, using sample data")
+                        documents = await self.create_sample_data()
             
             if not documents:
                 raise ValueError("No documents to process")

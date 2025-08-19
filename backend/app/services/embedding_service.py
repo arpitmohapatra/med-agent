@@ -39,18 +39,28 @@ class EmbeddingService:
                 return [0.0] * self.dimensions
 
             # Get embedding based on provider
-            if self.deployment_name:  # Azure
-                response = await self.client.Embedding.acreate(
-                    input=[text],
-                    engine=self.deployment_name
+            if settings.azure_openai_endpoint and settings.azure_openai_api_key:
+                # Azure OpenAI
+                from openai import AzureOpenAI
+                client = AzureOpenAI(
+                    api_key=settings.azure_openai_api_key,
+                    api_version=settings.azure_openai_api_version,
+                    azure_endpoint=settings.azure_openai_endpoint
                 )
-            else:  # OpenAI
-                response = await self.client.Embedding.acreate(
-                    input=[text],
+                response = client.embeddings.create(
+                    input=text,
+                    model=settings.azure_openai_embedding_deployment
+                )
+            else:
+                # OpenAI
+                from openai import OpenAI
+                client = OpenAI(api_key=settings.openai_api_key)
+                response = client.embeddings.create(
+                    input=text,
                     model=self.model
                 )
             
-            embedding = response['data'][0]['embedding']
+            embedding = response.data[0].embedding
             
             # Validate embedding dimensions
             if len(embedding) != self.dimensions:

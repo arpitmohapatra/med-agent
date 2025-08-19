@@ -31,79 +31,79 @@ class MedQueryEvaluator:
         self.llm_service = LLMService()
 
     def get_evaluation_queries(self) -> List[Dict[str, Any]]:
-        """Get evaluation queries with expected criteria."""
+        """Get evaluation queries with expected criteria based on the medicine dataset."""
         return [
             {
                 "id": "q1",
-                "query": "What are the side effects of Paracetamol?",
-                "expected_keywords": ["nausea", "stomach pain", "rash", "liver"],
+                "query": "What are the side effects of Augmentin 625?",
+                "expected_keywords": ["vomiting", "nausea", "diarrhea", "augmentin"],
                 "category": "side_effects"
             },
             {
                 "id": "q2", 
-                "query": "What is Amoxicillin used for?",
-                "expected_keywords": ["bacterial", "infection", "bronchitis", "pneumonia"],
+                "query": "What is Azithral 500 tablet used for?",
+                "expected_keywords": ["bacterial", "infection", "azithral"],
                 "category": "uses"
             },
             {
                 "id": "q3",
-                "query": "What are substitutes for Metformin?",
-                "expected_keywords": ["glucophage", "glumetza", "diabetes"],
+                "query": "What are substitutes for Allegra 120mg?",
+                "expected_keywords": ["lcfex", "etofex", "nexofex", "fexise", "histafree"],
                 "category": "substitutes"
             },
             {
                 "id": "q4",
-                "query": "How should I take Omeprazole?",
-                "expected_keywords": ["dosage", "before breakfast", "once daily"],
-                "category": "dosage"
+                "query": "Is Atarax 25mg habit forming?",
+                "expected_keywords": ["atarax", "habit", "forming", "no"],
+                "category": "safety"
             },
             {
                 "id": "q5",
-                "query": "What is the composition of Lisinopril?",
-                "expected_keywords": ["lisinopril", "mg", "composition"],
-                "category": "composition"
+                "query": "What class is Ascoril LS syrup?",
+                "expected_keywords": ["respiratory", "cough", "ascoril"],
+                "category": "drug_class"
             },
             {
                 "id": "q6",
-                "query": "Who manufactures Paracetamol?",
-                "expected_keywords": ["manufacturer", "pharma", "company"],
-                "category": "manufacturer"
+                "query": "Side effects of Azee 500 tablet",
+                "expected_keywords": ["vomiting", "nausea", "abdominal", "diarrhea"],
+                "category": "side_effects"
             },
             {
                 "id": "q7",
-                "query": "Medicine for fever and headache",
-                "expected_keywords": ["paracetamol", "acetaminophen", "fever", "headache"],
-                "category": "symptom_search"
+                "query": "Medicines for bacterial infections",
+                "expected_keywords": ["augmentin", "azithral", "azee", "antibiotic"],
+                "category": "therapeutic_search"
             },
             {
                 "id": "q8",
-                "query": "Antibiotics for bacterial infection",
-                "expected_keywords": ["amoxicillin", "antibiotic", "bacterial"],
+                "query": "Antihistamine medicines",
+                "expected_keywords": ["allegra", "avil", "atarax", "antihistamine"],
                 "category": "class_search"
             },
             {
                 "id": "q9",
-                "query": "Diabetes medication side effects",
-                "expected_keywords": ["metformin", "diabetes", "side effects"],
-                "category": "condition_search"
+                "query": "Respiratory medicines for cough",
+                "expected_keywords": ["ascoril", "respiratory", "cough", "mucus"],
+                "category": "therapeutic_search"
             },
             {
                 "id": "q10",
-                "query": "High blood pressure treatment options",
-                "expected_keywords": ["lisinopril", "blood pressure", "hypertension"],
-                "category": "condition_search"
-            },
-            {
-                "id": "q11",
-                "query": "What medicines cause stomach upset?",
-                "expected_keywords": ["stomach", "nausea", "gastrointestinal"],
+                "query": "What causes nausea as side effect?",
+                "expected_keywords": ["nausea", "side", "effect"],
                 "category": "adverse_effects"
             },
             {
+                "id": "q11",
+                "query": "Macrolide antibiotics",
+                "expected_keywords": ["macrolides", "azithral", "azee"],
+                "category": "chemical_class"
+            },
+            {
                 "id": "q12",
-                "query": "Safe dosage for acetaminophen",
-                "expected_keywords": ["paracetamol", "dosage", "500mg", "maximum"],
-                "category": "dosage_safety"
+                "query": "Medicines that cause dizziness",
+                "expected_keywords": ["dizziness", "side", "allegra", "atarax"],
+                "category": "adverse_effects"
             }
         ]
 
