@@ -5,7 +5,7 @@ class AuthService {
   private currentUser: User | null = null;
 
   async login(username: string, password: string): Promise<User> {
-    const token = await apiService.login({ username, password });
+    await apiService.login({ username, password });
     const user = await apiService.getCurrentUser();
     this.currentUser = user;
     return user;

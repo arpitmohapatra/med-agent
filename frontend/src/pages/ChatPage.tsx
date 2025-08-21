@@ -19,7 +19,7 @@ const ChatPage: React.FC = () => {
   const [isStreaming, setIsStreaming] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [currentQuery, setCurrentQuery] = useState<string>('');
-  const [streamingMessageId, setStreamingMessageId] = useState<string | null>(null);
+  const [_streamingMessageId, setStreamingMessageId] = useState<string | null>(null);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -126,6 +126,7 @@ const ChatPage: React.FC = () => {
     }
 
     if (chunk.content) {
+      console.log('📝 Received chunk:', JSON.stringify(chunk.content));
       // Update the last assistant message with new content
       setMessages(prev => {
         const newMessages = [...prev];

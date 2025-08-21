@@ -19,11 +19,15 @@ class Settings(BaseSettings):
     azure_openai_deployment_name: str = "gpt-4"
     azure_openai_embedding_deployment: str = "text-embedding-3-small"
     
-    # Elasticsearch Configuration
-    elasticsearch_url: str = "http://localhost:9200"
-    elasticsearch_index: str = "medquery_documents"
-    elasticsearch_username: Optional[str] = None
-    elasticsearch_password: Optional[str] = None
+    # Elasticsearch Configuration (commented out - now using ChromaDB)
+    # elasticsearch_url: str = "http://localhost:9200"
+    elasticsearch_index: str = "medquery_documents"  # Reused for ChromaDB collection name
+    # elasticsearch_username: Optional[str] = None
+    # elasticsearch_password: Optional[str] = None
+    
+    # ChromaDB Configuration
+    chromadb_path: str = "./chroma_db"
+    chromadb_collection: str = "medquery_documents"
     
     # Application Configuration
     app_name: str = "MedQuery"

@@ -58,7 +58,7 @@ start-backend:
 
 start-frontend:
 	@echo "⚛️  Starting frontend development server..."
-	cd frontend && npm start
+	cd frontend && npm run dev
 
 # Docker
 docker-dev:

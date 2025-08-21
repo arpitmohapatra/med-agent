@@ -6,14 +6,16 @@ from ..models.user import User
 from ..models.chat import RAGResponse, RAGDocument
 from ..services.auth import get_current_user
 from ..services.embedding_service import EmbeddingService
-from ..services.elasticsearch_service import ElasticsearchService
+# from ..services.elasticsearch_service import ElasticsearchService
+from ..services.chromadb_service import ChromaDBService
 
 router = APIRouter(prefix="/api/rag", tags=["rag"])
 logger = logging.getLogger(__name__)
 
 # Initialize services
 embedding_service = EmbeddingService()
-es_service = ElasticsearchService()
+# es_service = ElasticsearchService()
+chroma_service = ChromaDBService()
 
 
 @router.post("/index")
@@ -25,7 +27,7 @@ async def index_documents(
     """Index documents into Elasticsearch."""
     try:
         # Ensure index exists
-        await es_service.create_index()
+        await chroma_service.create_index()
         
         docs_to_process = []
         
@@ -83,7 +85,7 @@ async def index_documents(
             all_embedded_chunks.extend(embedded_chunks)
         
         # Index embedded chunks
-        success = await es_service.bulk_index_documents(all_embedded_chunks)
+        success = await chroma_service.bulk_index_documents(all_embedded_chunks)
         
         if success:
             return {
@@ -119,14 +121,14 @@ async def search_documents(
             query_embedding = await embedding_service.get_embedding(query)
             
             # Perform semantic search
-            results = await es_service.semantic_search(
+            results = await chroma_service.semantic_search(
                 query_vector=query_embedding,
                 query_text=query,
                 top_k=top_k
             )
         elif search_type == "keyword":
             # Perform keyword search
-            results = await es_service.keyword_search(
+            results = await chroma_service.keyword_search(
                 query=query,
                 top_k=top_k
             )
@@ -166,7 +168,7 @@ async def search_documents(
 async def get_index_stats(current_user: User = Depends(get_current_user)):
     """Get Elasticsearch index statistics."""
     try:
-        stats = await es_service.get_index_stats()
+        stats = await chroma_service.get_index_stats()
         return stats
     except Exception as e:
         logger.error(f"Error getting index stats: {e}")
@@ -180,7 +182,7 @@ async def get_index_stats(current_user: User = Depends(get_current_user)):
 async def delete_index(current_user: User = Depends(get_current_user)):
     """Delete the entire index."""
     try:
-        success = await es_service.delete_index()
+        success = await chroma_service.delete_index()
         if success:
             return {"message": "Index deleted successfully"}
         else:

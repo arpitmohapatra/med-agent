@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
-import { UserIcon, CpuChipIcon } from '@heroicons/react/24/outline';
+import { User, Bot } from 'lucide-react';
 import { ChatMessage } from '../../types';
 import { formatTimestamp, classNames } from '../../utils/helpers';
 import { MEDICAL_DISCLAIMER } from '../../utils/constants';
@@ -31,9 +31,9 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, isStreaming }) =
             : 'bg-medical-100 text-medical-600'
         )}>
           {isUser ? (
-            <UserIcon className="w-5 h-5" />
+            <User className="w-5 h-5" />
           ) : (
-            <CpuChipIcon className="w-5 h-5" />
+            <Bot className="w-5 h-5" />
           )}
         </div>
 

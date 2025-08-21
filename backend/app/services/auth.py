@@ -12,9 +12,35 @@ users_db: dict[str, UserInDB] = {}
 security = HTTPBearer()
 
 
+def _initialize_demo_user():
+    """Initialize demo user if users_db is empty."""
+    if not users_db:
+        from ..core.security import get_password_hash
+        
+        demo_user_id = str(uuid.uuid4())
+        hashed_password = get_password_hash("password123")
+        now = datetime.utcnow()
+        
+        demo_user = UserInDB(
+            id=demo_user_id,
+            email="demo@medquery.com",
+            username="demo",
+            full_name="Demo User",
+            is_active=True,
+            hashed_password=hashed_password,
+            created_at=now,
+            updated_at=now
+        )
+        
+        users_db[demo_user_id] = demo_user
+        print(f"✅ Initialized demo user: {demo_user.username}")
+
+
 class AuthService:
     def __init__(self):
         self.users_db = users_db
+        # Initialize demo user if this is the first time
+        _initialize_demo_user()
 
     def get_user_by_username(self, username: str) -> Optional[UserInDB]:
         """Get user by username."""

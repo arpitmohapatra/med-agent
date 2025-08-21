@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosResponse } from 'axios';
+import axios, { AxiosInstance } from 'axios';
 import { 
   User, 
   AuthToken, 
@@ -14,7 +14,7 @@ class ApiService {
 
   constructor() {
     this.api = axios.create({
-      baseURL: process.env.REACT_APP_API_URL || 'http://localhost:8000',
+      baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000',
       headers: {
         'Content-Type': 'application/json',
       },
@@ -85,6 +85,7 @@ class ApiService {
     onChunk: (chunk: any) => void,
     onError?: (error: any) => void
   ): Promise<void> {
+    console.log('🚀 Starting streaming request:', request.message);
     try {
       const response = await fetch(`${this.api.defaults.baseURL}/api/chat`, {
         method: 'POST',

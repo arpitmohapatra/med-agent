@@ -11,23 +11,6 @@ class EmbeddingService:
         """Initialize the embedding service."""
         self.model = settings.embedding_model
         self.dimensions = settings.embedding_dimensions
-        
-        # Configure OpenAI client based on provider
-        if settings.azure_openai_endpoint and settings.azure_openai_api_key:
-            # Azure OpenAI configuration
-            openai.api_type = "azure"
-            openai.api_base = settings.azure_openai_endpoint
-            openai.api_key = settings.azure_openai_api_key
-            openai.api_version = settings.azure_openai_api_version
-            self.client = openai
-            self.deployment_name = settings.azure_openai_embedding_deployment
-        else:
-            # OpenAI configuration
-            openai.api_key = settings.openai_api_key
-            if settings.openai_organization:
-                openai.organization = settings.openai_organization
-            self.client = openai
-            self.deployment_name = None
 
     async def get_embedding(self, text: str) -> List[float]:
         """Get embedding for a single text."""
@@ -88,19 +71,29 @@ class EmbeddingService:
                 cleaned_batch = [text.replace("\n", " ").strip() for text in batch]
                 
                 # Get embeddings for batch
-                if self.deployment_name:  # Azure
-                    response = await self.client.Embedding.acreate(
-                        input=cleaned_batch,
-                        engine=self.deployment_name
+                if settings.azure_openai_endpoint and settings.azure_openai_api_key:
+                    # Azure OpenAI
+                    from openai import AzureOpenAI
+                    client = AzureOpenAI(
+                        api_key=settings.azure_openai_api_key,
+                        api_version=settings.azure_openai_api_version,
+                        azure_endpoint=settings.azure_openai_endpoint
                     )
-                else:  # OpenAI
-                    response = await self.client.Embedding.acreate(
+                    response = client.embeddings.create(
+                        input=cleaned_batch,
+                        model=settings.azure_openai_embedding_deployment
+                    )
+                else:
+                    # OpenAI
+                    from openai import OpenAI
+                    client = OpenAI(api_key=settings.openai_api_key)
+                    response = client.embeddings.create(
                         input=cleaned_batch,
                         model=self.model
                     )
                 
                 # Extract embeddings
-                batch_embeddings = [item['embedding'] for item in response['data']]
+                batch_embeddings = [item.embedding for item in response.data]
                 all_embeddings.extend(batch_embeddings)
                 
                 logger.info(f"Generated embeddings for batch {i//batch_size + 1}")

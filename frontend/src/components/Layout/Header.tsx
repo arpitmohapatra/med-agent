@@ -1,12 +1,11 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { 
-  Cog6ToothIcon, 
-  UserCircleIcon,
-  ChatBubbleLeftRightIcon,
-  DocumentMagnifyingGlassIcon,
-  CpuChipIcon 
-} from '@heroicons/react/24/outline';
+  Settings, 
+  UserCircle,
+  MessageCircle,
+  Search,
+  Bot 
+} from 'lucide-react';
 import { ChatMode } from '../../types';
 import { CHAT_MODE_LABELS, CHAT_MODE_DESCRIPTIONS } from '../../utils/constants';
 import { classNames } from '../../utils/helpers';
@@ -26,12 +25,10 @@ const Header: React.FC<HeaderProps> = ({
   onLogout,
   currentUser,
 }) => {
-  const navigate = useNavigate();
-
   const modes: Array<{ key: ChatMode; icon: React.ElementType; color: string }> = [
-    { key: 'ask', icon: ChatBubbleLeftRightIcon, color: 'text-blue-600' },
-    { key: 'rag', icon: DocumentMagnifyingGlassIcon, color: 'text-medical-600' },
-    { key: 'agent', icon: CpuChipIcon, color: 'text-purple-600' },
+    { key: 'ask', icon: MessageCircle, color: 'text-blue-600' },
+    { key: 'rag', icon: Search, color: 'text-medical-600' },
+    { key: 'agent', icon: Bot, color: 'text-purple-600' },
   ];
 
   return (
@@ -79,11 +76,11 @@ const Header: React.FC<HeaderProps> = ({
             className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
             title="Settings"
           >
-            <Cog6ToothIcon className="w-5 h-5" />
+            <Settings className="w-5 h-5" />
           </button>
           
           <div className="flex items-center space-x-2">
-            <UserCircleIcon className="w-6 h-6 text-gray-400" />
+            <UserCircle className="w-6 h-6 text-gray-400" />
             <span className="text-sm text-gray-700">
               {currentUser?.full_name || currentUser?.username || 'User'}
             </span>

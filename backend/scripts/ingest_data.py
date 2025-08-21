@@ -14,7 +14,8 @@ from datetime import datetime
 # Add parent directory to path for imports
 sys.path.append(str(Path(__file__).parent.parent))
 
-from app.services.elasticsearch_service import ElasticsearchService
+# from app.services.elasticsearch_service import ElasticsearchService
+from app.services.chromadb_service import ChromaDBService
 from app.services.embedding_service import EmbeddingService
 from app.core.config import settings
 
@@ -24,7 +25,8 @@ logger = logging.getLogger(__name__)
 
 class MedicineDataIngester:
     def __init__(self):
-        self.es_service = ElasticsearchService()
+        # self.es_service = ElasticsearchService()
+        self.chroma_service = ChromaDBService()
         self.embedding_service = EmbeddingService()
 
     async def download_kaggle_dataset(self, dataset_name: str = "shubhendumishra/medicine-recommendation-system"):
@@ -224,7 +226,7 @@ class MedicineDataIngester:
         try:
             # Create index
             logger.info("Creating Elasticsearch index...")
-            await self.es_service.create_index()
+            await self.chroma_service.create_index()
             
             # Load data
             if use_sample:
@@ -298,13 +300,13 @@ class MedicineDataIngester:
             
             # Index in Elasticsearch
             logger.info("Indexing documents in Elasticsearch...")
-            success = await self.es_service.bulk_index_documents(all_chunks)
+            success = await self.chroma_service.bulk_index_documents(all_chunks)
             
             if success:
                 logger.info("✅ Data ingestion completed successfully!")
                 
                 # Get stats
-                stats = await self.es_service.get_index_stats()
+                stats = await self.chroma_service.get_index_stats()
                 logger.info(f"Index stats: {stats}")
                 
                 return True

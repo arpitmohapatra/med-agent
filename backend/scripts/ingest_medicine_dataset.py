@@ -15,7 +15,8 @@ import time
 # Add parent directory to path for imports
 sys.path.append(str(Path(__file__).parent.parent))
 
-from app.services.elasticsearch_service import ElasticsearchService
+# from app.services.elasticsearch_service import ElasticsearchService
+from app.services.chromadb_service import ChromaDBService
 from app.services.embedding_service import EmbeddingService
 from app.core.config import settings
 
@@ -25,7 +26,8 @@ logger = logging.getLogger(__name__)
 
 class MedicineDatasetIngester:
     def __init__(self):
-        self.es_service = ElasticsearchService()
+        # self.es_service = ElasticsearchService()
+        self.chroma_service = ChromaDBService()
         self.embedding_service = EmbeddingService()
 
     async def process_medicine_batch(self, batch_df: pd.DataFrame) -> list:
@@ -133,9 +135,6 @@ class MedicineDatasetIngester:
                 "uses": uses_text,
                 "side_effects": side_effects_text,
                 "substitutes": substitutes_text,
-                "uses_list": uses,
-                "side_effects_list": side_effects,
-                "substitutes_list": substitutes,
                 "type": "medicine",
                 "source": "medicine_dataset_csv",
                 "total_side_effects": len(side_effects),
@@ -158,8 +157,8 @@ class MedicineDatasetIngester:
             
             # Create/recreate index
             logger.info("Creating Elasticsearch index...")
-            await self.es_service.delete_index()  # Clean start
-            await self.es_service.create_index()
+            await self.chroma_service.delete_index()  # Clean start
+            await self.chroma_service.create_index()
             
             # Load dataset
             logger.info(f"Loading dataset from {csv_path}")
@@ -189,7 +188,7 @@ class MedicineDatasetIngester:
                     embedded_docs = await self.process_medicine_batch(batch_df)
                     
                     # Index in Elasticsearch
-                    success = await self.es_service.bulk_index_documents(embedded_docs)
+                    success = await self.chroma_service.bulk_index_documents(embedded_docs)
                     
                     if success:
                         processed_count += len(embedded_docs)
@@ -217,7 +216,7 @@ class MedicineDatasetIngester:
             logger.info(f"🚀 Average rate: {processed_count/total_time:.1f} docs/sec")
             
             # Get final index stats
-            stats = await self.es_service.get_index_stats()
+            stats = await self.chroma_service.get_index_stats()
             logger.info(f"📈 Index stats: {stats}")
             
             return True
@@ -245,7 +244,7 @@ class MedicineDatasetIngester:
                 query_embedding = await self.embedding_service.get_embedding(query)
                 
                 # Search
-                results = await self.es_service.semantic_search(
+                results = await self.chroma_service.semantic_search(
                     query_vector=query_embedding,
                     query_text=query,
                     top_k=3

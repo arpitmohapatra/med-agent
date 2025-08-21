@@ -15,7 +15,8 @@ from datetime import datetime
 # Add parent directory to path for imports
 sys.path.append(str(Path(__file__).parent.parent))
 
-from app.services.elasticsearch_service import ElasticsearchService
+# from app.services.elasticsearch_service import ElasticsearchService
+from app.services.chromadb_service import ChromaDBService
 from app.services.embedding_service import EmbeddingService
 from app.services.llm_service import LLMService
 from app.models.chat import ChatMessage, ChatMode
@@ -26,7 +27,8 @@ logger = logging.getLogger(__name__)
 
 class MedQueryEvaluator:
     def __init__(self):
-        self.es_service = ElasticsearchService()
+        # self.es_service = ElasticsearchService()
+        self.chroma_service = ChromaDBService()
         self.embedding_service = EmbeddingService()
         self.llm_service = LLMService()
 
@@ -116,7 +118,7 @@ class MedQueryEvaluator:
             query_embedding = await self.embedding_service.get_embedding(query)
             
             # Perform semantic search
-            results = await self.es_service.semantic_search(
+            results = await self.chroma_service.semantic_search(
                 query_vector=query_embedding,
                 query_text=query,
                 top_k=top_k

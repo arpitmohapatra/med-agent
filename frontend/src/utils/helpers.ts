@@ -1,4 +1,6 @@
 import { format, formatDistanceToNow, isToday, isYesterday } from 'date-fns';
+import { type ClassValue } from 'clsx';
+import { cn } from '@/lib/utils';
 
 export const formatTimestamp = (timestamp: string | Date): string => {
   const date = typeof timestamp === 'string' ? new Date(timestamp) : timestamp;
@@ -148,6 +150,6 @@ export const generateId = (): string => {
   return Math.random().toString(36).substr(2, 9);
 };
 
-export const classNames = (...classes: (string | undefined | null | false)[]): string => {
-  return classes.filter(Boolean).join(' ');
+export const classNames = (...classes: ClassValue[]): string => {
+  return cn(...classes);
 };

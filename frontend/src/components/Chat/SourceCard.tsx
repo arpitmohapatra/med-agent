@@ -1,12 +1,12 @@
 import React from 'react';
 import { 
-  LinkIcon, 
-  StarIcon, 
-  DocumentTextIcon,
-  InformationCircleIcon,
-  ExclamationTriangleIcon,
-  ArrowsRightLeftIcon
-} from '@heroicons/react/24/outline';
+  Link2, 
+  Star, 
+  FileText,
+  Info,
+  AlertTriangle,
+  ArrowLeftRight
+} from 'lucide-react';
 import { Source } from '../../types';
 import { extractMedicineInfo, truncateText, classNames } from '../../utils/helpers';
 
@@ -47,7 +47,7 @@ const SourceCard: React.FC<SourceCardProps> = ({ source, index }) => {
           'text-xs px-2 py-1 rounded-full font-medium',
           getScoreColor(source.score)
         )}>
-          <StarIcon className="w-3 h-3 inline mr-1" />
+          <Star className="w-3 h-3 inline mr-1" />
           {(source.score * 100).toFixed(0)}%
         </div>
       </div>
@@ -58,7 +58,7 @@ const SourceCard: React.FC<SourceCardProps> = ({ source, index }) => {
           {/* Chemical/Therapeutic Class */}
           {(medicineInfo.chemicalClass || medicineInfo.therapeuticClass) && (
             <div className="flex items-start space-x-2">
-              <DocumentTextIcon className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+              <FileText className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
               <div>
                 <span className="text-xs font-medium text-gray-600">Class:</span>
                 <p className="text-sm text-gray-700">
@@ -73,7 +73,7 @@ const SourceCard: React.FC<SourceCardProps> = ({ source, index }) => {
           
           {medicineInfo.uses && (
             <div className="flex items-start space-x-2">
-              <InformationCircleIcon className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
+              <Info className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
               <div>
                 <span className="text-xs font-medium text-gray-600">Uses:</span>
                 <p className="text-sm text-gray-700">{truncateText(medicineInfo.uses, 120)}</p>
@@ -83,7 +83,7 @@ const SourceCard: React.FC<SourceCardProps> = ({ source, index }) => {
           
           {medicineInfo.sideEffects && (
             <div className="flex items-start space-x-2">
-              <ExclamationTriangleIcon className="w-4 h-4 text-yellow-400 mt-0.5 flex-shrink-0" />
+              <AlertTriangle className="w-4 h-4 text-yellow-400 mt-0.5 flex-shrink-0" />
               <div>
                 <span className="text-xs font-medium text-gray-600">Side Effects:</span>
                 <p className="text-sm text-gray-700">{truncateText(medicineInfo.sideEffects, 120)}</p>
@@ -93,7 +93,7 @@ const SourceCard: React.FC<SourceCardProps> = ({ source, index }) => {
           
           {medicineInfo.substitutes && (
             <div className="flex items-start space-x-2">
-              <ArrowsRightLeftIcon className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
+              <ArrowLeftRight className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
               <div>
                 <span className="text-xs font-medium text-gray-600">Substitutes:</span>
                 <p className="text-sm text-gray-700">{truncateText(medicineInfo.substitutes, 120)}</p>
@@ -104,7 +104,7 @@ const SourceCard: React.FC<SourceCardProps> = ({ source, index }) => {
           {/* Habit Forming Warning */}
           {medicineInfo.habitForming && medicineInfo.habitForming !== 'No' && medicineInfo.habitForming !== 'NA' && (
             <div className="flex items-start space-x-2">
-              <ExclamationTriangleIcon className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" />
+              <AlertTriangle className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" />
               <div>
                 <span className="text-xs font-medium text-red-600">Habit Forming:</span>
                 <p className="text-sm text-red-700">{medicineInfo.habitForming}</p>
@@ -140,7 +140,7 @@ const SourceCard: React.FC<SourceCardProps> = ({ source, index }) => {
             onClick={handleCardClick}
             className="flex items-center space-x-1 text-primary-600 hover:text-primary-700 transition-colors"
           >
-            <LinkIcon className="w-3 h-3" />
+            <Link2 className="w-3 h-3" />
             <span>View</span>
           </button>
         )}

@@ -1,8 +1,7 @@
 import React from 'react';
-import { DocumentTextIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { FileText, Search } from 'lucide-react';
 import { Source } from '../../types';
 import SourceCard from './SourceCard';
-import { classNames } from '../../utils/helpers';
 
 interface SourcePanelProps {
   sources: Source[];
@@ -19,7 +18,7 @@ const SourcePanel: React.FC<SourcePanelProps> = ({
     return (
       <div className="bg-gray-50 border-l border-gray-200 w-80 p-4">
         <div className="flex items-center space-x-2 mb-4">
-          <MagnifyingGlassIcon className="w-5 h-5 text-gray-400 animate-pulse" />
+          <Search className="w-5 h-5 text-gray-400 animate-pulse" />
           <h2 className="text-lg font-medium text-gray-900">Searching...</h2>
         </div>
         
@@ -47,12 +46,12 @@ const SourcePanel: React.FC<SourcePanelProps> = ({
     return (
       <div className="bg-gray-50 border-l border-gray-200 w-80 p-4">
         <div className="flex items-center space-x-2 mb-4">
-          <DocumentTextIcon className="w-5 h-5 text-gray-400" />
+          <FileText className="w-5 h-5 text-gray-400" />
           <h2 className="text-lg font-medium text-gray-900">Sources</h2>
         </div>
         
         <div className="text-center py-8">
-          <DocumentTextIcon className="mx-auto h-12 w-12 text-gray-300" />
+          <FileText className="mx-auto h-12 w-12 text-gray-300" />
           <h3 className="mt-2 text-sm font-medium text-gray-900">No sources</h3>
           <p className="mt-1 text-sm text-gray-500">
             Sources will appear here when using RAG mode
@@ -67,7 +66,7 @@ const SourcePanel: React.FC<SourcePanelProps> = ({
       {/* Header */}
       <div className="p-4 border-b border-gray-200 bg-white">
         <div className="flex items-center space-x-2 mb-2">
-          <DocumentTextIcon className="w-5 h-5 text-medical-600" />
+          <FileText className="w-5 h-5 text-medical-600" />
           <h2 className="text-lg font-medium text-gray-900">Sources</h2>
           <span className="bg-medical-100 text-medical-800 text-xs px-2 py-1 rounded-full">
             {sources.length}

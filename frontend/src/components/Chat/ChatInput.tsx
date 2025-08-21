@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { PaperAirplaneIcon, MicrophoneIcon, StopIcon } from '@heroicons/react/24/outline';
+import { Send, Mic, Square } from 'lucide-react';
 import { ChatMode } from '../../types';
 import { SAMPLE_QUERIES } from '../../utils/constants';
 import { classNames } from '../../utils/helpers';
@@ -139,7 +139,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
               title="Voice input (coming soon)"
               disabled
             >
-              <MicrophoneIcon className="w-5 h-5" />
+              <Mic className="w-5 h-5" />
             </button>
 
             {/* Stop/Send Button */}
@@ -150,7 +150,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
                 className="flex-shrink-0 p-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
                 title="Stop generation"
               >
-                <StopIcon className="w-5 h-5" />
+                <Square className="w-5 h-5" />
               </button>
             ) : (
               <button
@@ -164,7 +164,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
                 )}
                 title="Send message"
               >
-                <PaperAirplaneIcon className="w-5 h-5" />
+                <Send className="w-5 h-5" />
               </button>
             )}
           </div>

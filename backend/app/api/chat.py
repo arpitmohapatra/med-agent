@@ -8,7 +8,8 @@ from ..models.user import User
 from ..services.auth import get_current_user
 from ..services.llm_service import LLMService
 from ..services.embedding_service import EmbeddingService
-from ..services.elasticsearch_service import ElasticsearchService
+# from ..services.elasticsearch_service import ElasticsearchService
+from ..services.chromadb_service import ChromaDBService
 from ..services.mcp_service import MCPService
 
 router = APIRouter(prefix="/api", tags=["chat"])
@@ -17,7 +18,8 @@ logger = logging.getLogger(__name__)
 # Initialize services
 llm_service = LLMService()
 embedding_service = EmbeddingService()
-es_service = ElasticsearchService()
+# es_service = ElasticsearchService()
+chroma_service = ChromaDBService()
 mcp_service = MCPService()
 
 
@@ -102,7 +104,7 @@ async def handle_rag_mode(request: ChatRequest, messages: List[ChatMessage]):
         query_embedding = await embedding_service.get_embedding(request.message)
         
         # Search for relevant documents
-        search_results = await es_service.semantic_search(
+        search_results = await chroma_service.semantic_search(
             query_vector=query_embedding,
             query_text=request.message
         )
