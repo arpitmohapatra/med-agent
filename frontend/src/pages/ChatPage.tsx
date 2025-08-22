@@ -9,6 +9,11 @@ import ChatInput from '../components/Chat/ChatInput';
 import SourcePanel from '../components/Chat/SourcePanel';
 import { generateId } from '../utils/helpers';
 import toast from 'react-hot-toast';
+import { Button } from '../components/ui/button';
+import { Card } from '../components/ui/card';
+import { ScrollArea } from '../components/ui/scroll-area';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../components/ui/collapsible';
+import { ChevronLeft, ChevronRight, Bot } from 'lucide-react';
 
 const ChatPage: React.FC = () => {
   const navigate = useNavigate();
@@ -20,6 +25,7 @@ const ChatPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [currentQuery, setCurrentQuery] = useState<string>('');
   const [_streamingMessageId, setStreamingMessageId] = useState<string | null>(null);
+  const [isSourcePanelCollapsed, setIsSourcePanelCollapsed] = useState<boolean>(false);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -184,6 +190,8 @@ const ChatPage: React.FC = () => {
     setStreamingMessageId(null);
   };
 
+  // Toggle function now handled by Collapsible component automatically
+
   const handleSettingsClick = () => {
     navigate('/settings');
   };
@@ -200,7 +208,7 @@ const ChatPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="h-screen bg-background flex flex-col">
       {/* Header */}
       <Header
         currentMode={currentMode}
@@ -213,62 +221,104 @@ const ChatPage: React.FC = () => {
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">
         {/* Chat Area */}
-        <div className="flex-1 flex flex-col">
+        <div className={`flex flex-col transition-all duration-500 ease-in-out ${
+          currentMode === 'rag' && !isSourcePanelCollapsed 
+            ? 'w-1/2' 
+            : 'flex-1'
+        }`}>
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto custom-scrollbar">
-            <div className="max-w-4xl mx-auto px-6 py-6">
+          <ScrollArea className="flex-1 p-0">
+            <div className="max-w-4xl mx-auto px-6 py-6 space-y-6">
               {messages.length === 0 ? (
-                <div className="text-center py-12">
-                  <div className="w-16 h-16 bg-gradient-to-br from-medical-500 to-primary-600 rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <span className="text-white font-bold text-2xl">M</span>
+                <Card className="text-center py-12 border-0 shadow-lg bg-gradient-to-br from-background to-muted/20 animate-in fade-in-50 duration-700">
+                  <div className="w-20 h-20 bg-gradient-to-br from-primary to-primary/80 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg animate-in zoom-in-50 duration-700 delay-150">
+                    <Bot className="w-10 h-10 text-primary-foreground" />
                   </div>
-                  <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+                  <h2 className="text-3xl font-bold text-foreground mb-3 animate-in slide-in-from-bottom-4 duration-700 delay-300">
                     Welcome to MedQuery
                   </h2>
-                  <p className="text-gray-600 mb-6">
+                  <p className="text-muted-foreground mb-8 text-lg animate-in slide-in-from-bottom-4 duration-700 delay-450">
                     Your AI assistant for medical knowledge and research
                   </p>
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-md mx-auto">
-                    <h3 className="font-medium text-blue-900 mb-2">Current Mode: {currentMode.toUpperCase()}</h3>
-                    <p className="text-sm text-blue-700">
-                      {currentMode === 'ask' && 'Ask general medical questions'}
-                      {currentMode === 'rag' && 'Query medicine database with sources'}
-                      {currentMode === 'agent' && 'AI agent with tool access for research'}
+                  <Card className="p-6 max-w-md mx-auto bg-primary/5 border-primary/20 animate-in slide-in-from-bottom-4 duration-700 delay-600">
+                    <h3 className="font-semibold text-primary mb-3 text-lg">
+                      Current Mode: {currentMode.toUpperCase()}
+                    </h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      {currentMode === 'ask' && 'Ask general medical questions and get comprehensive answers'}
+                      {currentMode === 'rag' && 'Query our medicine database with verified sources and references'}
+                      {currentMode === 'agent' && 'Advanced AI agent with tool access for deep research'}
                     </p>
-                  </div>
-                </div>
+                  </Card>
+                </Card>
               ) : (
-                <>
+                <div className="space-y-6 animate-in fade-in-50 duration-500">
                   {messages.map((message, index) => (
-                    <MessageBubble
+                    <div 
                       key={index}
-                      message={message}
-                      isStreaming={isStreaming && index === messages.length - 1}
-                    />
+                      className="animate-in slide-in-from-bottom-4 duration-500"
+                      style={{ animationDelay: `${index * 100}ms` }}
+                    >
+                      <MessageBubble
+                        message={message}
+                        isStreaming={isStreaming && index === messages.length - 1}
+                      />
+                    </div>
                   ))}
-                </>
+                </div>
               )}
               <div ref={messagesEndRef} />
             </div>
-          </div>
+          </ScrollArea>
 
           {/* Input */}
-          <ChatInput
-            onSendMessage={handleSendMessage}
-            disabled={isStreaming}
-            mode={currentMode}
-            isStreaming={isStreaming}
-            onStop={handleStopStreaming}
-          />
+          <div className="border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+            <ChatInput
+              onSendMessage={handleSendMessage}
+              disabled={isStreaming}
+              mode={currentMode}
+              isStreaming={isStreaming}
+              onStop={handleStopStreaming}
+            />
+          </div>
         </div>
 
         {/* Source Panel (only in RAG mode) */}
         {currentMode === 'rag' && (
-          <SourcePanel
-            sources={sources}
-            isLoading={isStreaming && sources.length === 0}
-            query={currentQuery}
-          />
+          <Collapsible
+            open={!isSourcePanelCollapsed}
+            onOpenChange={(open) => setIsSourcePanelCollapsed(!open)}
+            className={`relative transition-all duration-500 ease-in-out ${
+              isSourcePanelCollapsed ? 'w-12' : 'w-1/2'
+            } border-l bg-card/50 backdrop-blur supports-[backdrop-filter]:bg-card/30 flex flex-col animate-in slide-in-from-right duration-500`}
+          >
+            {/* Toggle Button - Left side handle */}
+            <CollapsibleTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 z-10 w-8 h-16 rounded-l-lg border border-r-0 bg-background/95 hover:bg-muted/80 transition-all duration-300 group shadow-md backdrop-blur"
+                title={isSourcePanelCollapsed ? 'Expand sources' : 'Collapse sources'}
+              >
+                <div className="flex items-center justify-center">
+                  {isSourcePanelCollapsed ? (
+                    <ChevronLeft className="h-4 w-4 transition-transform duration-300 group-hover:scale-110" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4 transition-transform duration-300 group-hover:scale-110" />
+                  )}
+                </div>
+              </Button>
+            </CollapsibleTrigger>
+            
+            {/* Source Panel Content */}
+            <CollapsibleContent className="flex-1 overflow-hidden animate-in slide-in-from-right duration-300">
+              <SourcePanel
+                sources={sources}
+                isLoading={isStreaming && sources.length === 0}
+                query={currentQuery}
+              />
+            </CollapsibleContent>
+          </Collapsible>
         )}
       </div>
     </div>

@@ -2,6 +2,9 @@ import { format, formatDistanceToNow, isToday, isYesterday } from 'date-fns';
 import { type ClassValue } from 'clsx';
 import { cn } from '@/lib/utils';
 
+// Re-export cn for backward compatibility
+export { cn };
+
 export const formatTimestamp = (timestamp: string | Date): string => {
   const date = typeof timestamp === 'string' ? new Date(timestamp) : timestamp;
   
